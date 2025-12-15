@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二語組み合わせ 発想ツール</title>
+    <style>
+        /* 基本設定 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            text-align: center;
+            padding: 20px 10px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        h1 {
+            color: #1e88e5;
+            margin-bottom: 40px;
+            font-size: 1.6em;
+        }
+
+        /* 語句コンテナ：画面サイズに関係なく常に縦に積み重ねる設定に変更 */
+        .word-container {
+            display: flex;
+            flex-direction: column; /* ★この設定で常に上下配置になります★ */
+            align-items: center; /* 中央揃え */
+            gap: 20px; /* 上下の隙間 */
+            margin-bottom: 30px;
+        }
+
+        /* 語句ボックスの共通スタイル */
+        .word-box {
+            background-color: #ffffff;
+            border: 3px solid #1e88e5;
+            border-radius: 15px;
+            padding: 30px 20px;
+            width: 85%; /* 画面幅の85%を使用 */
+            max-width: 400px; /* 最大幅を少し広めに設定 */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .word-box:hover {
+            transform: translateY(-5px);
+        }
+        .word-label {
+            font-size: 0.8em;
+            color: #1e88e5;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .word-display {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+            min-height: 1.2em;
+        }
+
+        /* ボタンとガイダンスのスタイル（変更なし） */
+        .change-button {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            text-align: center;
+            font-size: 1.1em;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        .change-button:hover {
+            background-color: #fb8c00;
+        }
+        .guidance {
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9em;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>二語を組み合わせて新しいアイデアを生み出そう！</h1>
+
+    <div class="word-container">
+        <div class="word-box">
+            <div class="word-label">状況 (Scenario)</div>
+            <div id="situationWord" class="word-display">―</div>
+        </div>
+
+        <div class="word-box">
+            <div class="word-label">物 (Item / Theme)</div>
+            <div id="objectWord" class="word-display">―</div>
+        </div>
+    </div>
+
+    <button class="change-button" onclick="displayNewWords()">新しい組み合わせ！</button>
+
+    <div class="guidance">
+        <p>💡 「状況」と「物」を強制的に組み合わせて、「どんな課題が解決できるか？」「どんな新しい商品・サービスが生まれるか？」を考えてみましょう。</p>
+    </div>
+
+    <script>
+        // --------------------------------------------------------
+        // 「状況（場面）」50個
+        // --------------------------------------------------------
+        const situations = [
+            "移動中の乗り物", "休憩・リラックス", "スキルアップの時間", "自分だけの空間",
+            "情報探し", "人との会話", "イベント企画", "近所との関わり",
+            "何かを待つ時間", "ネット交流", "旅先での宿泊", "集中したい時",
+            "食事の準備", "天気が悪い日", "気持ちの切り替え", "チームでの作業",
+            "誰かの役に立つ活動", "駅・空港の利用", "長旅の移動", "外でのひと休み",
+            "お店での買い物", "趣味のコレクション", "朝の準備", "SNSでの発信",
+            "体を動かす活動", "ゴミを減らす工夫", "お風呂や洗面所", "緊急事態",
+            "特別な日の準備", "将来の夢", "好きなものへの情熱", "意見の衝突",
+            "電池切れ", "寒い場所", "暑い場所", "新しい挑戦",
+            "一人ご飯", "高齢者との交流", "持ち物の整理整頓", "みんなの前での発表",
+            "うっかりミス", "乗り物に乗る時", "高いところ", "静けさ",
+            "サプライズ計画", "初めての体験", "旅行中の移動", "雨上がりの景色",
+            "立ち話", "寝る前の時間"
+        ];
+
+        // --------------------------------------------------------
+        // 「物（テーマ）」50個
+        // --------------------------------------------------------
+        const objects = [
+            "自動販売機", "ドローン", "電子辞書", "スポーツドリンク", "折りたたみ傘",
+            "スマートフォン", "お掃除ロボット", "地球儀", "透明な箱", "消しゴムのカス",
+            "観葉植物", "VRゴーグル", "古い写真", "チョーク", "プロジェクター",
+            "ヘルメット", "懐中電灯", "鍵とキーホルダー", "鏡", "防犯ブザー",
+            "ぬいぐるみ", "SNSの投稿", "点字ブロック", "ビニール袋", "段ボール箱",
+            "モバイルバッテリー", "レジ袋", "温度・湿度計", "付箋（ポストイット）", "マスク",
+            "QRコード", "スマートウォッチ", "作業服・ユニフォーム", "ペットボトルキャップ", "給水器",
+            "楽器（キーボード）", "風力発電の模型", "使い捨てカイロ", "タイムカプセル", "砂時計",
+            "カレンダー", "靴のインソール", "防音設備", "リサイクルマーク", "非常食",
+            "音楽プレイヤー", "手帳（スケジュール帳）", "バーコード", "公園のベンチ", "ロゴマーク"
+        ];
+
+        let lastSituationIndex = -1;
+        let lastObjectIndex = -1;
+
+        function getRandomIndex(max, lastIndex) {
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * max);
+            } while (newIndex === lastIndex);
+            return newIndex;
+        }
+
+        function displayNewWords() {
+            const situationDisplay = document.getElementById('situationWord');
+            const objectDisplay = document.getElementById('objectWord');
+
+            const newSituationIndex = getRandomIndex(situations.length, lastSituationIndex);
+            situationDisplay.textContent = situations[newSituationIndex];
+            lastSituationIndex = newSituationIndex;
+
+            const newObjectIndex = getRandomIndex(objects.length, lastObjectIndex);
+            objectDisplay.textContent = objects[newObjectIndex];
+            lastObjectIndex = newObjectIndex;
+        }
+
+        displayNewWords();
+    </script>
+</body>
+</html>
