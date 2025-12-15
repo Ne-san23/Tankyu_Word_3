@@ -1,0 +1,1 @@
+# Tankyu_Word_3
